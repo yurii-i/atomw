@@ -2,7 +2,7 @@
 
 ##### Установка и запуск
 - установка - npm install
-- хапуск -  NODE_ENV=production node app.js 
+- запуск -  NODE_ENV=production node app.js (или npm start)
 - конфиги находятся в ./config и зависят от переменной окружения NODE_ENV, заданной при запуске
 
 ##### Описание
