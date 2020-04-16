@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TITLE</title>
+</head>
+<body>
+	userId:
+	<div id='userId'></div>
+	<hr>
+	status:
+	<div id='status'></div>
+	<hr>
+	<button id="showBtcPrice">Узнать цену BTC</button>
+	<div id ="price">0.00</div>
+	<hr>
+
+	<script type="text/javascript">
+
+		(function run() {
+			const userId = generateUserId();
+			const userIdElement = document.getElementById('userId');
+			userIdElement.innerHTML = userId;
+
+			const priceElement = document.getElementById('price');
+			const statusElement = document.getElementById('status');
+
+			const socket = new WebSocket("ws://localhost:3001");
+
+			socket.onopen = function(event) {
+				wsStatus('connected via ws');
+				socket.send(JSON.stringify({userId}));
+			};
+
+			socket.onclose = function(event) {
+				if (event.wasClean) wsStatus('connection close'); 
+				else {
+					wsStatus(`connection close with error, ${event.code}`);
+					// реконнект в случае ошибки подключения
+					return setTimeout(run, 1000);
+				} 
+			};
+
+			socket.onmessage = function(event) {
+	  			priceElement.innerHTML = event.data;
+			};
+
+			socket.onerror = function(error) {
+				console.log(error.message);
+			};
+
+			function generateUserId() {
+				return `u_${new Date().getTime()}_${Math.round(Math.random()*1000000)}`;
+			};
+
+			function wsStatus(status) {
+				statusElement.innerHTML = status;
+			};
+		})()
+
+		const showBtcPriceButton = document.getElementById('showBtcPrice');
+
+		showBtcPriceButton.onclick = function(event) {
+			const userIdElement = document.getElementById('userId');
+			
+		    fetch('api', {
+		    	method : 'POST',
+		    	headers: {
+    				'Content-Type': 'application/json;charset=utf-8'
+  				},
+  				body: JSON.stringify({userId:userIdElement.innerHTML})
+		    }).then(console.log)
+		}
+	</script>
+</body>
+</html>
